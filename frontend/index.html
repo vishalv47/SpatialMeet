@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpatialMeet - Spatial Audio Conferencing</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-headphones-alt"></i>
+                <span>SpatialMeet</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <div class="nav-user" id="nav-user" style="display: none;">
+                    <span id="user-display-name"></span>
+                    <button class="btn btn-outline" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Login/Register Form -->
+        <div class="auth-container" id="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2 id="auth-title">Welcome to SpatialMeet</h2>
+                    <p>Experience immersive spatial audio conferencing</p>
+                </div>
+                
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="showLogin()">Login</button>
+                    <button class="tab-btn" onclick="showRegister()">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="login-username" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form" style="display: none;">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="register-username" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="register-email" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="register-displayname" placeholder="Display Name" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="register-password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Register
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main App Interface -->
+        <div class="app-container" id="app-container" style="display: none;">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-door-open"></i> Rooms</h3>
+                    <button class="btn btn-primary mb-2" onclick="showCreateRoomModal()">
+                        <i class="fas fa-plus"></i> Create Room
+                    </button>
+                    <div class="room-list" id="room-list">
+                        <!-- Rooms will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-content">
+                        <i class="fas fa-headphones-alt welcome-icon"></i>
+                        <h2>Welcome to SpatialMeet</h2>
+                        <p>Create or join a room to start your spatial audio conference experience.</p>
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <i class="fas fa-cube"></i>
+                                <h4>3D Spatial Audio</h4>
+                                <p>Experience immersive audio positioning</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-users"></i>
+                                <h4>Real-time Collaboration</h4>
+                                <p>Connect with multiple participants</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fas fa-microphone"></i>
+                                <h4>Audio Controls</h4>
+                                <p>Full control over your audio experience</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Interface -->
+                <div class="room-interface" id="room-interface" style="display: none;">
+                    <!-- Room Header -->
+                    <div class="room-header">
+                        <div class="room-info">
+                            <h2 id="current-room-name">Room Name</h2>
+                            <span class="room-code">Code: <span id="current-room-code"></span></span>
+                        </div>
+                        <div class="room-actions">
+                            <button class="btn btn-danger" onclick="leaveRoom()">
+                                <i class="fas fa-door-closed"></i> Leave Room
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Spatial Audio Canvas -->
+                    <div class="spatial-canvas-container">
+                        <div class="spatial-canvas" id="spatial-canvas">
+                            <div class="canvas-grid"></div>
+                            <div class="user-avatar self" id="self-avatar">
+                                <i class="fas fa-user"></i>
+                                <span class="avatar-name">You</span>
+                            </div>
+                            <!-- Other participants will be added here -->
+                        </div>
+                        <div class="canvas-controls">
+                            <span>Move around by clicking or dragging in the space above</span>
+                        </div>
+                    </div>
+
+                    <!-- Audio Controls -->
+                    <div class="audio-controls">
+                        <button class="control-btn" id="mic-btn" onclick="toggleMicrophone()">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="control-btn" id="speaker-btn" onclick="toggleSpeaker()">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-down"></i>
+                            <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="adjustVolume(this.value)">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                    </div>
+
+                    <!-- Participants Panel -->
+                    <div class="participants-panel">
+                        <h4><i class="fas fa-users"></i> Participants (<span id="participant-count">1</span>)</h4>
+                        <div class="participants-list" id="participants-list">
+                            <!-- Participants will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div class="modal" id="create-room-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Room</h3>
+                <button class="close-btn" onclick="closeCreateRoomModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="create-room-form">
+                <div class="input-group">
+                    <label>Room Name</label>
+                    <input type="text" id="room-name" placeholder="Enter room name" required>
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea id="room-description" placeholder="Room description (optional)"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Max Participants</label>
+                    <input type="number" id="max-participants" min="2" max="50" value="10">
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="room-private">
+                        Private Room
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateRoomModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

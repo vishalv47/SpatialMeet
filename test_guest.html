@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Mode Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 20px; margin: 10px; }
+        .hidden { display: none; }
+        .modal { border: 1px solid #ccc; padding: 20px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Guest Mode Test</h1>
+    
+    <button id="show-guest-modal">Show Guest Modal</button>
+    
+    <div id="guest-modal" class="modal hidden">
+        <h3>Continue as Guest</h3>
+        <form id="guest-form">
+            <label for="guest-displayname">Display Name (optional):</label><br>
+            <input type="text" id="guest-displayname" placeholder="Enter your name"><br><br>
+            <button type="submit">Continue as Guest</button>
+            <button type="button" id="close-modal">Cancel</button>
+        </form>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        // Test if basic functionality works
+        document.getElementById('show-guest-modal').addEventListener('click', function() {
+            console.log('Show modal button clicked');
+            document.getElementById('guest-modal').classList.remove('hidden');
+        });
+        
+        document.getElementById('close-modal').addEventListener('click', function() {
+            console.log('Close modal button clicked');
+            document.getElementById('guest-modal').classList.add('hidden');
+        });
+        
+        document.getElementById('guest-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            console.log('Guest form submitted');
+            
+            const displayName = document.getElementById('guest-displayname').value.trim();
+            console.log('Display name:', displayName);
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = 'Testing guest endpoint...';
+            
+            try {
+                // Test with different base URLs
+                const urls = [
+                    'http://localhost:8080/api/guest/enter',
+                    'http://localhost:8081/api/guest/enter',
+                    '/api/guest/enter',
+                    './guest/enter'
+                ];
+                
+                for (const url of urls) {
+                    try {
+                        console.log('Testing URL:', url);
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `displayName=${encodeURIComponent(displayName)}`
+                        });
+                        
+                        console.log('Response from', url, ':', response.status);
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Success with', url, ':', data);
+                            resultsDiv.innerHTML = `SUCCESS with ${url}: ${JSON.stringify(data, null, 2)}`;
+                            break;
+                        } else {
+                            console.log('Failed with', url, '- status:', response.status);
+                        }
+                    } catch (error) {
+                        console.log('Error with', url, ':', error.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Overall error:', error);
+                resultsDiv.innerHTML = 'Error: ' + error.message;
+            }
+        });
+        
+        console.log('Test page loaded');
+    </script>
+</body>
+</html>
