@@ -242,7 +242,8 @@ mvn clean package
 - Check network tab for failed API requests
 - Monitor application logs for errors and warnings
 
-## Contributing
+## Preview
+
 ![image alt](https://github.com/vishalv47/SpatialMeet/blob/c96fd526d02ef25db464fb40a9f21ae84e1347b3/Screenshot%202025-08-13%20013330java.png)
 
 ## License
